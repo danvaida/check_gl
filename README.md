@@ -3,7 +3,7 @@
 # About
 
 The purpose of this plugin is to perform `GET` requests against the [Graylog](https://www.graylog.org) REST API endpoints.
-The response is compliant with the Icinga plugin output format.
+The response is compliant with the [Icinga](https://www.icinga.org/products/icinga-2/) plugin output format.
 
 # Disclaimer
 
