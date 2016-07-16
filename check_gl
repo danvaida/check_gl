@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# (c) 2016, Dan Vaida <vaida.dan@gmail.com>
+# Code is available at: https://github.com/danvaida/check_gl
+#
+# This plugin is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License or
+# (at your option) any later version.
+#
+# This plugin is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+import sys
+import getopt
+import urllib2
+import base64
+import json
+import jsonpath
+
+def usage():
+    print "\nUnsupported, missing or malformed parameter(s)! \n"
+    print "Parameters: \n"
+    print '-V, --version                                      |   (optional, displays script version) \n'
+    print '-h, --help                                         |   (optional, displays this information) \n'
+    print '-u, --user <username>                              |   (mandatory) \n'
+    print '-p, --password <password>                          |   (mandatory) \n'
+    print '-e, --endpoint <protocol>://<host>:<port>/<path>   |   (mandatory) \n'
+    print '-f, --filter <object>                              |   (mandatory) \n'
+    print '-c, --critical <integer>                           |   (mandatory) \n'
+    print '-w, --warning <integer>                            |   (mandatory) \n'
+    print 'Example: \n'
+    print './check_gl --endpoint http://localhost:12900/system/metrics/org.graylog2.buffers.process.usage --user ansible --pass 1234 --filter buffers.input.utilization -c 50 -w 100'
+
+def main(argv):
+  _header = {'Content-Type', 'application/json'}
+  _method = "GET"
+  _endpoint = 'http://localhost:12900'
+  _user = ''
+  _password = ''
+  _filter = ''
+  _version = '0.1'
+  _critical = '0'
+  _warning = '0'
+  found_h = False
+  found_V = False
+  found_u = False
+  found_p = False
+  found_e = False
+  found_f = False
+  found_c = False
+  found_w = False
+
+  try:
+      opts, args = getopt.getopt(argv, "Vhu:p:e:f:c:w:", ["version", "help", "user=", "password=", "endpoint=", "filter=", "critical=", "warning="])
+  except getopt.GetoptError:
+      usage()
+      sys.exit(0)
+
+  for opt, arg in opts:
+      if opt in ("-V", "--version"):
+          print _version
+          found_V = True
+          sys.exit(0)
+      elif opt in ("-h", "--help"):
+          found_h = True
+          usage()
+          sys.exit(0)
+      elif opt in ("-u", "--user"):
+          _user = arg
+          found_u = True
+      elif opt in ("-p", "--password"):
+          _password = arg
+          found_p = True
+      elif opt in ("-e", "--endpoint"):
+          _endpoint = arg
+          found_e = True
+      elif opt in ("-f", "--filter"):
+          _filter = arg
+          found_f = True
+      elif opt in ("-c", "--critical"):
+          _critical = int(arg)
+          found_c = True
+      elif opt in ("-w", "--warning"):
+          _warning = int(arg)
+          found_w = True
+
+  if not found_u or not found_p or not found_e or not found_f or not found_c or not found_w:
+    usage()
+    sys.exit(0)
+
+  req = urllib2.Request(_endpoint)
+  req.add_header(*_header)
+  base64string = base64.encodestring('%s:%s' % (_user, _password)).replace('\n', '')
+  req.add_header("Authorization", "Basic %s" % base64string)   
+
+  try: 
+    response = urllib2.urlopen(req).read()
+    response = json.loads(response.decode('utf-8'))
+    value = int(str(jsonpath.jsonpath(response, _filter))[1:-1])
+
+    if (_warning >= _critical):
+        print 'Critical threshold must not be lower or equal to the warning threshold!'
+        sys.exit(3)
+    elif (value >= _critical):
+        print "GRAYLOG CRITICAL - value: %s | " % (value)
+        sys.exit(2)
+    elif (value >= _warning):
+        print "GRAYLOG WARNING - value: %s | " % (value)
+        sys.exit(1)
+    else:
+        print "GRAYLOG OK - value: %s | " % (value)
+        sys.exit(0)
+
+  except urllib2.URLError, e:
+      print e.reason
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
