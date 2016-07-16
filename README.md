@@ -5,6 +5,8 @@
 The purpose of this plugin is to perform `GET` requests against the [Graylog](https://www.graylog.org) REST API endpoints.
 The response is compliant with the [Icinga](https://www.icinga.org/products/icinga-2/) plugin output format.
 
+![Screenshot](https://github.com/danvaida/check_gl/blob/master/screenshot.png?raw=true)
+
 # Disclaimer
 
 Although used in some projects, I regard this plugin as a pamphlet and recommend others to view it for what it is: some lines scribbled on a napkin meanwhile on a beach :wink:
