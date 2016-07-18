@@ -17,10 +17,7 @@ See how you can browse through the Graylog API [here](https://www.graylog.org/bl
 
 Install `JSONPath` dependency with:
 
-    $ cd deps
-    $ tar xvzf jsonpath-0.54.tar.gz
-    $ cd jsonpath-0.54
-    $ python setup.py install
+    $ pip install -r requirements.txt
 
 Instructions for installing Icinga plugins are [here](http://docs.icinga.org/icinga2/latest/doc/module/icinga2/chapter/addons-plugins)
 
