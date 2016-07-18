@@ -2,4 +2,4 @@ clean:
 	rm -f server
 
 build: clean
-	crystal build server.cr --release
+	crystal compile server.cr --release
