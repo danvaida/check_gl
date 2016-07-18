@@ -1,0 +1,9 @@
+---
+name: "check_gl"
+description: "file:///README.md"
+url: "https://github.com/danvaida/check_gl"
+tags: Graylog2
+vendor: Graylog2
+type: Plugin
+target: Log
+license: gplv3
