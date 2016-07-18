@@ -58,7 +58,7 @@ def main(argv):
       opts, args = getopt.getopt(argv, "Vhu:p:e:f:c:w:", ["version", "help", "user=", "password=", "endpoint=", "filter=", "critical=", "warning="])
   except getopt.GetoptError:
       usage()
-      sys.exit(0)
+      sys.exit(3)
 
   for opt, arg in opts:
       if opt in ("-V", "--version"):
@@ -90,7 +90,7 @@ def main(argv):
 
   if not found_u or not found_p or not found_e or not found_f or not found_c or not found_w:
     usage()
-    sys.exit(0)
+    sys.exit(3)
 
   req = urllib2.Request(_endpoint)
   req.add_header(*_header)
@@ -117,6 +117,7 @@ def main(argv):
 
   except urllib2.URLError, e:
       print e.reason
+      sys.exit(3)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
